@@ -1,0 +1,191 @@
+THIS IS AN employment manegement systment 
+#include <stdio.h> // for input output funtion likr
+#include <stdlib.h>
+#include <conio.h>
+#include <windows.h> /// for windows related functio
+#include <string.h> // string operations
+
+// list of global variable #/
+
+COORD  coord = {0, 0};
+
+
+
+// function : gotoxy
+ // @peram input: x and y coordinates
+
+ //# operam output move the cursor in specified  position of console
+
+
+ void gotoxy(int x, int y)
+ {
+    coord.X= x;
+    coord.Y = y;
+
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+
+ }
+
+ /** main function started*/
+
+ int main()
+ {
+    FILE *fp, *ft;  // file pointers
+    char another, choice;
+
+    /** structure that reprsent a employee */
+
+    struct emp
+    {
+        char name[40]; // name of employee
+        int age; // age of emplpyee
+        float bs; // basic salery of employee
+    };
+
+    struct emp e; // structure variable creation
+
+    char empname[40]; /// t string to store name of the employee
+
+    long int recsize; ///size of each record of employee
+
+    /** open the file in binary read write mode
+     * if the file EMP. DAT ALready exist then it open  that file in read  write
+     * if the file doesn>] t exit it simply creat a new copy
+    */
+
+   fp = fopen("EMP.DAT","rb+");
+   if(fp == NULL)
+   {
+    fp = fopen("EMP.DAT", "wb+");
+    if(fp == NULL)
+    {
+        printf("Connot open file");
+        exit(1);
+
+    }
+   }
+
+   /// sizeo of each record i.e size of stucture variable
+   recsize = sizeof(e);
+
+   /// infinte loop continues untile the break state
+   while(1)
+{
+    system("cls"); // clear the console window
+    gotoxy(30,10); // move the cursor
+    printf("1. Add Record"); // option for add
+    gotoxy(30,12);
+    printf("2.List Records"); // option for showing existing
+    gotoxy(30,14);
+    printf("3. MODIFY Records"); /// option for editing record
+    gotoxy(30,16);
+    printf("4.Delete Records"); /// option for deleting record
+    gotoxy(30,18);
+    printf("5.Exit"); // exit from the program
+    gotoxy(30,20);
+    printf("Your Choice:"); /// enter the choice 1,2,3,4,5,
+    fflush(stdin); /// flush the input buffer
+    choice = getche(); /// get the input from keyboard
+    switch(choice)
+    {
+      case '1' : /// if user press 1
+       system("cls");
+       fseek(fp,0,SEEK_END); /// search the file   and move cusor to end to end of
+
+       another = 'y';
+       while(another == 'y') // if user want to  another
+       {
+        printf("\nEnter name:");
+        scanf("%s",e.name);
+        printf("\nEnter age:");
+        scanf("%d",&e.age);
+        printf("\nENTER BASIC SALARY:");
+        scanf("%f",&e.bs);
+
+        fwrite(&e, recsize,1,fp); // write the record in the  file
+
+        printf("\nAdd another record(y/n)");
+        fflush(stdin);
+        another = getche();
+
+
+       }
+       break;
+
+     case '2':
+     system("cls");
+     rewind(fp) ; /// this moves file cursor to start
+     while(fread(&e,recsize, 1,fp)==1) /// read  the file the record one  per fetch
+     {
+        printf("\n%s %d 5.2f", e.name, e.age, e.bs); /// print the name age and basic basic salery
+
+    }
+     getch();
+     break;
+
+     case '3':
+     system("cls");
+     another = 'y';
+     while(another == 'y')
+     {
+        printf("Enter the employee name to modify:");
+        scanf("%s", empname);
+        rewind(fp);
+        while(fread(&e, recsize, 1, fp)== 1) //  fetch all record from file
+         {
+                if(strcmp(e. name,empname)== 0) /// if entered name match with that
+                {
+                    printf("\nEnter new name, age and bs:");
+                    scanf("%s%d%f",e.name,&e.age,&e.bs );
+                    fseek(fp, -recsize,SEEK_CUR ); // MOVE  the  cursor 1 step  back from current position
+                    fwrite(&e,recsize, 1, fp);  // overide the  record
+                    break;
+                }
+         }
+
+  printf("\nModify another record(y/n)");
+  fflush(stdin);
+  another = getche();
+
+
+     }
+     break;
+    case '4':
+      system("cls");
+      another = 'y';
+      while(another =='y')
+      {
+        printf("\nEnter name of employee to delete:");
+        scanf("%s",empname);
+        ft = fopen("Temp.dat","wb"); /// create a intermediate file for temporary
+        rewind(fp); /// move record to stating of file
+        while(fread(&e,recsize,1,fp) == 1) // read all
+        {
+            if(strcmp(e.name,empname) !=0) /// if the entered record match
+            {
+                fwrite(&e,recsize,1,ft); /// move all record
+            }
+
+        }
+        fclose(fp);
+        fclose(ft);
+        remove("EMP.DAT"); // REMOVE THHE ORIGNAL FILE
+        rename("TEMP.dat", "EMP.DAT");
+        fp = fopen("EMP.DAT","rb+");
+        printf("delete another record(y/n)");
+        fflush(stdin);
+        another = getche();
+
+
+      }
+      break;
+      case '5':
+      fclose(fp); /// close the file
+      exit(0); /// exit from the program
+
+
+    }
+}
+ return 0;
+
+ }
