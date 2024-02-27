@@ -1,2 +1,2 @@
 # c-project
-tis are all my project in c programming language
+These are all my projects in the c programming language
